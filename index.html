@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>صمت وقت الصلاة — واجهة</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <h1>صمت وقت الصلاة — واجهة</h1>
+
+    <section class="card">
+      <label>المدينة / الولاية (بالإنجليزية أو اسم محلي)</label>
+      <div class="row">
+        <input id="city" type="text" value="Alger" />
+        <input id="country" type="text" value="Algeria" />
+        <button id="getBtn">جلب مواقيت اليوم</button>
+      </div>
+      <p class="muted">المصدر: Aladhan API (يمكن تغييره لاحقًا إلى proxy لـ marw.dz)</p>
+    </section>
+
+    <section class="card" id="todayCard" style="display:none">
+      <h2>مواقيت اليوم</h2>
+      <table id="timesTable">
+        <thead>
+          <tr><th>الصلاة</th><th>وقت الأذان</th><th>تفعيل تلقائي</th><th>تأخير قبل التفعيل</th><th>مدة الصمت</th><th>أوامر</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p id="status" class="muted"></p>
+    </section>
+
+    <section class="card">
+      <h3>إعدادات عامة</h3>
+      <div class="row">
+        <button id="requestNot">طلب إذن الإشعارات</button>
+        <button id="openDnd">فتح إعدادات عدم الإزعاج</button>
+      </div>
+      <p class="muted">ملاحظة: لتفعيل الصمت تلقائيًا ستحتاج تطبيق أصلي. هذه الواجهة تساعدك بالتذكير وفتح الإعدادات.</p>
+    </section>
+
+    <footer>مباشر وواضح — يعمل على متصفحات حديثة (Chrome Android يفضّل).</footer>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
+
