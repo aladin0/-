@@ -1,49 +1,241 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>صمت وقت الصلاة — واجهة</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>صمت وقت الصلاة</title>
+  <style>
+    body {
+      font-family: "Cairo", sans-serif;
+      background: linear-gradient(135deg, #d9e4dd, #f6f5f5);
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #00695c;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: #555;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 90%;
+      max-width: 450px;
+      margin-top: 25px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: -80px;
+      right: -80px;
+      width: 160px;
+      height: 160px;
+      background: #b2dfdb;
+      border-radius: 50%;
+      z-index: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      position: relative;
+      z-index: 2;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #004d40;
+      color: white;
+      border-radius: 6px 6px 0 0;
+    }
+
+    td {
+      background: #fafafa;
+    }
+
+    tr:hover td {
+      background: #e0f2f1;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      z-index: 2;
+      position: relative;
+    }
+
+    button {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mute {
+      background: #00796b;
+      color: white;
+    }
+
+    .mute:hover {
+      background: #004d40;
+    }
+
+    .unmute {
+      background: #ef5350;
+      color: white;
+    }
+
+    .unmute:hover {
+      background: #b71c1c;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 15px;
+      font-size: 13px;
+      color: #777;
+    }
+  </style>
 </head>
 <body>
-  <main>
-    <h1>صمت وقت الصلاة — واجهة</h1>
 
-    <section class="card">
-      <label>المدينة / الولاية (بالإنجليزية أو اسم محلي)</label>
-      <div class="row">
-        <input id="city" type="text" value="Alger" />
-        <input id="country" type="text" value="Algeria" />
-        <button id="getBtn">جلب مواقيت اليوم</button>
-      </div>
-      <p class="muted">المصدر: Aladhan API (يمكن تغييره لاحقًا إلى proxy لـ marw.dz)</p>
-    </section>
+  <header>
+    <h1>📱 صمت وقت الصلاة</h1>
+    <p>عرض مواقيت اليوم والتحكم في وضع الصمت بعد الأذان</p>
+  </header>
 
-    <section class="card" id="todayCard" style="display:none">
-      <h2>مواقيت اليوم</h2>
-      <table id="timesTable">
-        <thead>
-          <tr><th>الصلاة</th><th>وقت الأذان</th><th>تفعيل تلقائي</th><th>تأخير قبل التفعيل</th><th>مدة الصمت</th><th>أوامر</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <p id="status" class="muted"></p>
-    </section>
+  <div class="card">
+    <table id="prayerTable">
+      <thead>
+        <tr><th>الصلاة</th><th>الوقت</th><th>مدة الصمت</th></tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="3">جارٍ تحميل المواقيت...</td></tr>
+      </tbody>
+    </table>
 
-    <section class="card">
-      <h3>إعدادات عامة</h3>
-      <div class="row">
-        <button id="requestNot">طلب إذن الإشعارات</button>
-        <button id="openDnd">فتح إعدادات عدم الإزعاج</button>
-      </div>
-      <p class="muted">ملاحظة: لتفعيل الصمت تلقائيًا ستحتاج تطبيق أصلي. هذه الواجهة تساعدك بالتذكير وفتح الإعدادات.</p>
-    </section>
+    <div class="controls">
+      <button class="mute" onclick="activateSilent()">تفعيل الصمت</button>
+      <button class="unmute" onclick="deactivateSilent()">إلغاء الصمت</button>
+    </div>
+  </div>
 
-    <footer>مباشر وواضح — يعمل على متصفحات حديثة (Chrome Android يفضّل).</footer>
-  </main>
+  <footer>
+    ⏰ التطبيق يحسب وقت العشاء تلقائيًا (+1 ساعة و20 دقيقة بعد المغرب)
+  </footer>
 
-  <script src="app.js" defer></script>
+  <script>
+    const tableBody = document.querySelector("#prayerTable tbody");
+    const silentDurations = { Fajr: 10, Dhuhr: 10, Asr: 10, Maghrib: 5, Isha: 10 };
+
+    async function getPrayerTimes() {
+      try {
+        const response = await fetch("https://api.aladhan.com/v1/timingsByAddress?address=Algeria&method=2");
+        const data = await response.json();
+        const timings = data.data.timings;
+
+        // حساب العشاء تلقائيًا بعد المغرب بـ 1h20min
+        const maghribTime = timings["Maghrib"];
+        const ishaTime = addMinutesToTime(maghribTime, 80);
+
+        const prayers = [
+          { key: "Fajr", name: "الفجر", time: timings["Fajr"] },
+          { key: "Dhuhr", name: "الظهر", time: timings["Dhuhr"] },
+          { key: "Asr", name: "العصر", time: timings["Asr"] },
+          { key: "Maghrib", name: "المغرب", time: timings["Maghrib"] },
+          { key: "Isha", name: "العشاء", time: ishaTime }
+        ];
+
+        tableBody.innerHTML = "";
+        prayers.forEach(prayer => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${prayer.name}</td>
+            <td>${prayer.time}</td>
+            <td>
+              <input type="number" value="${silentDurations[prayer.key]}" min="1" max="60"
+                style="width:50px;text-align:center;border:1px solid #ccc;border-radius:5px;"
+                onchange="updateDuration('${prayer.key}', this.value)"> دقيقة
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+
+      } catch (err) {
+        tableBody.innerHTML = `<tr><td colspan='3'>⚠️ فشل تحميل المواقيت</td></tr>`;
+      }
+    }
+
+    function addMinutesToTime(timeStr, minutesToAdd) {
+      const [hours, minutes] = timeStr.split(':').map(Number);
+      const date = new Date();
+      date.setHours(hours);
+      date.setMinutes(minutes + minutesToAdd);
+      const newHours = String(date.getHours()).padStart(2, '0');
+      const newMinutes = String(date.getMinutes()).padStart(2, '0');
+      return `${newHours}:${newMinutes}`;
+    }
+
+    function updateDuration(prayer, value) {
+      silentDurations[prayer] = parseInt(value);
+      alert(`تم ضبط مدة الصمت بعد ${getArabicName(prayer)} إلى ${value} دقائق.`);
+    }
+
+    function getArabicName(prayer) {
+      const names = {
+        Fajr: "الفجر",
+        Dhuhr: "الظهر",
+        Asr: "العصر",
+        Maghrib: "المغرب",
+        Isha: "العشاء"
+      };
+      return names[prayer] || prayer;
+    }
+
+    function activateSilent() {
+      alert("🔇 تم تفعيل الوضع الصامت (محاكاة).");
+      document.body.style.background = "linear-gradient(135deg, #c8e6c9, #f1f8e9)";
+    }
+
+    function deactivateSilent() {
+      alert("🔊 تم إلغاء الوضع الصامت.");
+      document.body.style.background = "linear-gradient(135deg, #d9e4dd, #f6f5f5)";
+    }
+
+    getPrayerTimes();
+  </script>
+
 </body>
 </html>
 
